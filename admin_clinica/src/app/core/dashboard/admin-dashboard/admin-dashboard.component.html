@@ -39,8 +39,10 @@
                     </div>
                     <div class="dash-content dash-count">
                         <h4>Appointments</h4>
-                        <h2><span class="counter-up" [countUp]="250" [options]="{duration: 10}">250</span></h2>
-                        <p><span class="passive-view"><i class="feather icon-arrow-up-right me-1"></i>40%</span> vs last month</p>
+                        <h2><span class="counter-up" >{{ num_appointments_current }}/ <small>{{ num_appointments_before }}</small></span></h2>
+                        <p *ngIf="porcentaje_d >= 0"><span class="passive-view"><i class="feather icon-arrow-up-right me-1"></i>{{ porcentaje_d }}%</span> vs last month</p>
+                        <p *ngIf="porcentaje_d < 0" ><span class="negative-view"><i class="feather icon-arrow-down-right me-1"></i>{{ porcentaje_d }}%</span> vs last month</p>
+
                     </div>
                 </div>
             </div>
@@ -51,8 +53,10 @@
                     </div>
                     <div class="dash-content dash-count">
                         <h4>New Patients</h4>
-                        <h2><span class="counter-up" [countUp]="140" [options]="{duration: 10}">140</span></h2>
-                        <p><span class="passive-view"><i class="feather icon-arrow-up-right me-1"></i>20%</span> vs last month</p>
+                        <h2><span class="counter-up" >{{ num_patients_current }}/ <small>{{ num_patients_before }}</small></span></h2>
+                        <p *ngIf="porcentaje_dp >= 0"><span class="passive-view"><i class="feather icon-arrow-up-right me-1"></i>{{ porcentaje_dp }}%</span> vs last month</p>
+                        <p *ngIf="porcentaje_dp < 0"><span class="negative-view"><i class="feather icon-arrow-down-right me-1"></i>{{ porcentaje_dp }}%</span> vs last month</p>
+
                     </div>
                 </div>
             </div>
@@ -63,8 +67,10 @@
                     </div>
                     <div class="dash-content dash-count">
                         <h4>Operations</h4>
-                        <h2><span class="counter-up" [countUp]="56" [options]="{duration: 10}">56</span></h2>
-                        <p><span class="negative-view"><i class="feather icon-arrow-down-right me-1"></i>15%</span> vs last month</p>
+                        <h2><span class="counter-up" >{{ num_appointments_attention_current }}/ <small>{{ num_appointments_attention_before }}</small></span></h2>
+                        <p *ngIf="porcentaje_da >= 0" ><span class="passive-view"><i class="feather icon-arrow-down-right me-1"></i>{{ porcentaje_da }}%</span> vs last month</p>
+                        <p *ngIf="porcentaje_da < 0"><span class="negative-view"><i class="feather icon-arrow-down-right me-1"></i>{{ porcentaje_da }}%</span> vs last month</p>
+
                     </div>
                 </div>
             </div>
@@ -75,8 +81,14 @@
                     </div>
                     <div class="dash-content dash-count">
                         <h4>Earnings</h4>
-                        <h2>$<span class="counter-up" [countUp]="20250" [options]="{duration: 10}"> 20,250</span></h2>
-                        <p><span class="passive-view"><i class="feather icon-arrow-up-right me-1"></i>30%</span> vs last month</p>
+                        <!-- [countUp]="250" [options]="{duration: 10}
+                        [countUp]="140" [options]="{duration: 10}
+                        [countUp]="56" [options]="{duration: 10}"
+                        [countUp]="20250" [options]="{duration: 10} -->
+                        <h2>$<span class="counter-up" >{{ appointments_total_current }}/ <small>{{ appointments_total_before }}</small></span></h2>
+                        <p *ngIf="porcentaje_dt >= 0"><span class="passive-view"><i class="feather icon-arrow-up-right me-1"></i>{{ porcentaje_dt }}%</span> vs last month</p>
+                        <p *ngIf="porcentaje_dt < 0"><span class="negative-view"><i class="feather icon-arrow-down-right me-1"></i>{{ porcentaje_dt }}%</span> vs last month</p>
+
                     </div>
                 </div>
             </div>

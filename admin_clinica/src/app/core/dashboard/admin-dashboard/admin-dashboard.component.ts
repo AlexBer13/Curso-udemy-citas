@@ -17,6 +17,7 @@ import {
 import { Sort } from '@angular/material/sort';
 import { DataService } from 'src/app/shared/data/data.service';
 import { recentPatients, upcomingAppointments } from 'src/app/shared/models/models';
+import { DashboardService } from '../service/dashboard.service';
 export type ChartOptions = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   series: ApexAxisChartSeries | any;
@@ -55,7 +56,7 @@ interface data {
 })
 export class AdminDashboardComponent {
   public routes = routes;
-  public selectedValue ! : string  ;
+  public selectedValue : string = "2024" ;
   @ViewChild('chart') chart!: ChartComponent;
   public chartOptionsOne: Partial<ChartOptions>;
   public chartOptionsTwo: Partial<ChartOptions>;
@@ -63,7 +64,24 @@ export class AdminDashboardComponent {
   public recentPatients: Array<recentPatients> = [];
   public upcomingAppointments: Array<upcomingAppointments> = [];
  
-  constructor(public data : DataService) {
+  public appointments:any = []; 
+  public num_appointments_current:number = 0;
+  public num_appointments_before:number = 0;
+  public porcentaje_d:number = 0;
+
+  public num_patients_current:number = 0;
+  public num_patients_before:number = 0;
+  public porcentaje_dp:number = 0;
+
+  public num_appointments_attention_current:number = 0;
+  public num_appointments_attention_before:number = 0;
+  public porcentaje_da:number = 0;
+
+  public appointments_total_current:number = 0;
+  public appointments_total_before:number = 0;
+  public porcentaje_dt:number = 0;
+
+  constructor(public data : DataService,public dashboardService: DashboardService,) {
     this.chartOptionsOne = {
       chart: {
         height: 230,
@@ -177,7 +195,43 @@ export class AdminDashboardComponent {
     this.recentPatients = this.data.recentPatients;
     this.upcomingAppointments = this.data.upcomingAppointments;
   }
-  
+
+    ngOnInit(): void{
+
+
+      this.dashboardService.dashboardAdmin({}).subscribe((resp:any) => {
+        console.log(resp);
+        this.appointments = resp.appointments;
+
+        this.num_appointments_current = resp.num_appointments_current;
+        this.num_appointments_before = resp.num_appointments_before;
+        this.porcentaje_d = resp.porcentaje_d;
+
+        this.num_patients_current = resp.num_patients_current;
+        this.num_patients_before = resp.num_patients_before;
+        this.porcentaje_dp = resp.porcentaje_dp;
+
+        this.num_appointments_attention_current = resp.num_appointments_attention_current;
+        this.num_appointments_attention_before = resp.num_appointments_attention_before;
+        this.porcentaje_da = resp.porcentaje_da;
+
+        this.appointments_total_current = resp.num_appointments_total_current;
+        this.appointments_total_before = resp.num_appointments_total_before;
+        this.porcentaje_dt = resp.porcentaje_dt;
+      })
+    }
+
+    dashboardAdminYear(){
+
+      let data = {
+        year: this.selectedValue,
+      }
+      this.dashboardService.dashboardAdminYear(data).subscribe((resp:any) => {
+        console.log(resp)
+      })
+
+    }
+
   public sortData(sort: Sort) {
     const data = this.recentPatients.slice();
     const datas = this.upcomingAppointments.slice();
@@ -204,9 +258,9 @@ export class AdminDashboardComponent {
     }
   }
   selecedList: data[] = [
+    {value: '2024'},
+    {value: '2023'},
     {value: '2022'},
     {value: '2021'},
-    {value: '2020'},
-    {value: '2019'},
   ];
 }

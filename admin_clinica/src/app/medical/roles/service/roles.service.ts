@@ -16,8 +16,15 @@ export class RolesService {
   ) { }
 
   listRoles(){
-    let headers = new HttpHeaders({'Authorization': 'Bearer '+this.authService.token});
+    let headers = new HttpHeaders({'Authorization': 'Bearer'+this.authService.token});
     let URL = URL_SERVICIOS+"/roles";
+    return this.http.get(URL,{headers: headers});
+
+  }
+
+  showRoles(role_id:string){
+    let headers = new HttpHeaders({'Authorization': 'Bearer'+this.authService.token});
+    let URL = URL_SERVICIOS+"/roles/"+role_id;
     return this.http.get(URL,{headers: headers});
 
   }

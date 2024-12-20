@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\Rol;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 
 class RolesController extends Controller
 {
@@ -21,10 +22,13 @@ class RolesController extends Controller
         return response()->json([
             "roles" => $roles->map(function($rol){
                 return[
-                    "id" => $rol,
+                    "id" => $rol ->id,
                     "name" => $rol->name,
-                    "permission" => $rol->permissions,
-                    "create_at  " => $rol->created_at->format("Y-m-d h:i:s")
+                    "permision" => $rol->permissions,
+                    "permision_pluck" => $rol->permissions->pluck("name"),
+                    "created_at" => carbon::parse($rol->created_at)
+                                ->timezone('America/Mexico_City')
+                                ->format("Y-m-d h:i:s")
                 ];
             }),
         ]);
@@ -35,6 +39,7 @@ class RolesController extends Controller
      */
     public function store(Request $request)
     {
+    
         $is_role = Role::where("name",$request->name)->first();
 
         if($is_role){
@@ -57,14 +62,21 @@ class RolesController extends Controller
         ]);
     }
 
-
-
     /**
      * Display the specified resource.
      */
     public function show(string $id)
     {
-        //
+        $role = Role::findOrFail($id);
+        return response()->json([
+            "id" => $role ->id,
+            "name" => $role->name,
+            "permision" => $role->permissions,
+            "permision_pluck" => $role->permissions->pluck("name"),
+            "created_at" => carbon::parse($role->created_at)
+                                ->timezone('America/Mexico_City')
+                                ->format("Y-m-d h:i:s")
+        ]);
     }
 
     /**
@@ -77,16 +89,16 @@ class RolesController extends Controller
         if($is_role){
             return response()->json([
                 "message" => 403,
-                "message_text" => "El NOMBRE DEL ROL YA EXISTE"
+                "message_text" => "EL NOMBRE DEL ROL YA EXISTE"
             ]);
         }
 
         $role = Role::findOrFail($id);
 
-        $rol->update($request->all());
-        //["register_rol","edit_rol","register_paciente"];
-        $role->syncPermissions($request->$permisions);
-            return response()->json([
+        $role->update($request->all());
+        // ["register_rol","edit_rol","register_paciente"];
+        $role->syncPermissions($request->permisions);
+        return response()->json([
             "message" => 200,
         ]);
     }
@@ -97,6 +109,13 @@ class RolesController extends Controller
     public function destroy(string $id)
     {
         $role = Role::findOrFail($id);
+        if($role->users->count() > 0){
+            return response()->json([
+                "message" => 403,
+                "message" => "EL ROL SELECCIONADO NO SE PUEDE ELIMINAR POR MOTIVOS QUE YA TIENE USUARIOS RELACIONADOS"
+            ]);
+
+        }
         $role->delete();
         return response()->json([
             "message" => 200,

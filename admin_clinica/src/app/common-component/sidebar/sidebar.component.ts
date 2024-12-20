@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
+import { AuthService } from 'src/app/shared/auth/auth.service';
 import { DataService } from 'src/app/shared/data/data.service';
 import { MenuItem, SideBarData } from 'src/app/shared/models/models';
 import { routes } from 'src/app/shared/routes/routes';
@@ -20,13 +21,43 @@ export class SidebarComponent {
 
   public routes = routes;
   public sidebarData: Array<SideBarData> = [];
-
+  public user:any;
   constructor(
     private data: DataService,
     private router: Router,
-    private sideBar: SideBarService
+    private sideBar: SideBarService,
+    public authService: AuthService,
   ) {
-    this.sidebarData = this.data.sideBar;
+    //this.user = this.authService.user;
+    let USER = localStorage.getItem("user");
+    this.user = JSON.parse(USER ? USER : '');
+    // INICIO
+    if(this.user && this.user.roles.includes("Super-Admin")){
+      this.sidebarData = this.data.sideBar;
+    }
+    else{
+      //VAMOS A ENTRAR Y VAIDAR QUE OPCIONES PUEDE VER ESE ROL
+      let permissions = this.user.permissions;
+
+      let SIDE_BAR_G: any = [];
+      this.data.sideBar.forEach((side:any) =>{
+        let SIDE_B:any = [];
+        side.menu.forEach((menu_s:any) => {
+          let SUB_MENUS = menu_s.subMenus.filter((submenu:any) => permissions.includes(submenu.permision) && submenu.show_nav);
+          if(SUB_MENUS.length > 0){
+            menu_s.subMenus = SUB_MENUS;
+            SIDE_B.push(menu_s);
+          }
+        });
+        if(SIDE_B.length > 0){
+          side.menu = SIDE_B;
+          SIDE_BAR_G.push(side); 
+        }
+      })
+      this.sidebarData = SIDE_BAR_G;
+    }
+
+    //FIN
     router.events.subscribe((event: object) => {
       if (event instanceof NavigationEnd) {
         this.getRoutes(event);
