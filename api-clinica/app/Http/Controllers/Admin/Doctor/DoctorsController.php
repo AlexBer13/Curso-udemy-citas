@@ -24,6 +24,7 @@ class DoctorsController extends Controller
    
     public function index(Request $request)
     {
+        $this->authorize('viewAnyDoctor',Doctor::class);
         $search = $request->search;
 
         $users = User::where(DB::raw("CONCAT(users.name,' ',IFNULL(users.surname,''),' ',users.email)"),"like","%".$search."%")
@@ -43,7 +44,7 @@ class DoctorsController extends Controller
  
     public function profile($id){
 
-       
+        $this->authorize('profileDoctor',Doctor::class);
         $cachedRecord = Redis::get('profile_doctor_#'.$id);
         $data_doctor = [];
         if(isset($cachedRecord)) {
@@ -134,6 +135,7 @@ class DoctorsController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('createDoctor',Doctor::class);
         $schedule_hours = json_decode($request->schedule_hours,1);
 
         $users_is_valid = User::where("email",$request->email)->first();
@@ -192,6 +194,7 @@ class DoctorsController extends Controller
      */
     public function show(string $id)
     {
+        $this->authorize('viewDoctor',Doctor::class);
         $user = User::FindOrFail($id);
 
         return response()->json([
@@ -204,6 +207,7 @@ class DoctorsController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $this->authorize('update_doctor',Doctor::class);
         $schedule_hours = json_decode($request->schedule_hours,1);
 
         $users_is_valid = User::where("id","<>",$id)->where("email",$request->email)->first();
@@ -362,6 +366,7 @@ class DoctorsController extends Controller
      */
     public function destroy(string $id)
     {
+        $this->authorize('deleteDoctor',Doctor::class);
         $user = User::findOrFail($id);
         $user->delete();
         $cachedRecord = Redis::get('profile_doctor_#'.$id);

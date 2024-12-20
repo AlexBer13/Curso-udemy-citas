@@ -15,6 +15,7 @@ class AppointmentPayController extends Controller
      */
     public function index(Request $request)
     {
+        $this->authorize('viewAny',AppointmentPay::class);
         $specialitie_id = $request->specialitie_id;
         $search_doctor = $request->search_doctor;
         $search_patient = $request->search_patient;
@@ -37,19 +38,23 @@ class AppointmentPayController extends Controller
     public function store(Request $request)
     {
         $sum_total_pays = AppointmentPay::where("appointment_id",$request->appointment_id)->sum("amount");
-        if(($sum_total_pays + $request->amount) > $request->appointment_total){
-            return response()->json([
-                "message" => 403,
-                "message_text" => "EL MONTO QUE SE QUIERE REGISTRAR SUPERA AL COSTO DE LA CITA MEDICA",
-            ]);
-        }
+        // if(($sum_total_pays + $request->amount) > $request->appointment_total){
+        //     return response()->json([
+        //         "message" => 403,
+        //         "message_text" => "EL MONTO QUE SE QUIERE REGISTRAR SUPERA AL COSTO DE LA CITA MEDICA",
+        //     ]);
+        // }
+
+        $appointment = Appointment::findOrFail($request->appointment_id);
+        
+        $this->authorize('addPayment',$appointment);
+
         $appointment_pay = AppointmentPay::create([
             "appointment_id" =>  $request->appointment_id,
             "amount" => $request->amount,
             "method_payment"=> $request->method_payment,
         ]);
 
-        $appointment = Appointment::findOrFail($request->appointment_id);
         $is_total_payment = false;
         if(($appointment->amount) == ($sum_total_pays + $request->amount)){
             $appointment->update(["status_pay" => 1]);
@@ -86,7 +91,7 @@ class AppointmentPayController extends Controller
 
         $old_amount = $appointment_pay->amount;
         $new_amount =  $request->amount;
-
+        $this->authorize('view',$appointment_pay);
         if((($sum_total_pays - $old_amount) + $new_amount) > $request->appointment_total){
             return response()->json([
                 "message" => 403,
@@ -97,7 +102,7 @@ class AppointmentPayController extends Controller
         $appointment_pay->update([
             "amount" => $request->amount,
             "method_payment"=> $request->method_payment,
-        ]);
+        ]); 
 
         $appointment = Appointment::findOrFail($request->appointment_id);
         $is_total_payment = false;
@@ -127,7 +132,7 @@ class AppointmentPayController extends Controller
     public function destroy(string $id)
     {
         $appointment_pay = AppointmentPay::findOrFail($id);
-
+        $this->authorize('delete',$appointment_pay);
         $appointment = Appointment::findOrFail($appointment_pay->appointment_id);
         $appointment->update(["status_pay" => 2]);
 

@@ -45,7 +45,7 @@ Route::group([
 }); 
 
 Route::group([
-    //'middleware' => 'auth:api'
+    'middleware' => 'auth:api'
 ], function ($router) {
     Route::resource("roles",RolesController::class);
 
@@ -80,6 +80,7 @@ Route::group([
     Route::post("dashboard/admin-year",[DashboardKpiController::class,"dashboard_admin_year"]);
 
     Route::post("dashboard/doctor",[DashboardKpiController::class,"dashboard_doctor"]);
+    Route::get("dashboard/config",[DashboardKpiController::class,"config"]);
     Route::post("dashboard/doctor-year",[DashboardKpiController::class,"dashboard_doctor_year"]);
     
 }); 

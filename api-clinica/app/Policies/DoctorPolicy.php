@@ -5,14 +5,14 @@ namespace App\Policies;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
-class UserPolicy
+class DoctorPolicy
 {
-    /**
+     /**
      * Determine whether the user can view any models.
      */
-    public function viewAny(User $user): bool
+    public function viewAnyDoctor(User $user): bool
     {
-        if($user->can('list_staff')){
+        if($user->can('list_doctor')){
             return true;
         }
         return false;
@@ -21,9 +21,17 @@ class UserPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, User $model): bool
+    public function viewDoctor(User $user, User $model): bool
     {
-        if($user->can('edit_staff')){
+        if($user->can('edit_doctor')){
+            return true;
+        }
+        return false;
+    }
+
+    public function profileDoctor(User $user, User $model): bool
+    {
+        if($user->can('profile_doctor')){
             return true;
         }
         return false;
@@ -32,9 +40,9 @@ class UserPolicy
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function createDoctor(User $user): bool
     {
-        if($user->can('register_staff')){
+        if($user->can('register_doctor')){
             return true;
         }
         return false;
@@ -43,9 +51,9 @@ class UserPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, User $model): bool
+    public function updateDoctor(User $user, User $model): bool
     {
-        if($user->can('edit_staff')){
+        if($user->can('edit_doctor')){
             return true;
         }
         return false;
@@ -54,9 +62,9 @@ class UserPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, User $model): bool
+    public function deleteDoctor(User $user, User $model): bool
     {
-        if($user->can('delete_staff')){
+        if($user->can('delete_doctor')){
             return true;
         }
         return false;

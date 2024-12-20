@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Dashboard;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
@@ -11,6 +12,24 @@ use App\Http\Resources\Appointment\AppointmentCollection;
 class DashboardKpiController extends Controller
 {
     
+    public function config(){
+        $users = User::orderBy("id","desc")
+                ->whereHas("roles",function($q){
+                    $q->where("name","like","%DOCTOR%");
+                })
+                //->where("state",1)
+                ->get();
+
+        return response()->json([
+            "doctors" => $users->map(function($user){
+                return [
+                    "id" => $user->id,
+                    "full_name" => $user->name.' '. $user->surname,
+                    
+                ];
+            }),
+        ]);
+    }
 
     public function dashboard_admin(Request $request){
         date_default_timezone_set("America/Mexico_City");
@@ -132,18 +151,18 @@ class DashboardKpiController extends Controller
                         ->orderBy("year")
                         ->orderBy("month")
                         ->get();
-        $query_patients_specialty = DB::table("appointments")->where("appointments.deleted_at",NULL)  
+        $query_patients_speciality = DB::table("appointments")->where("appointments.deleted_at",NULL)  
                                     ->whereYear("appointments.date_appointment",$year)
                                     ->join("specialities","appointments.specialitie_id", "=" ,"specialities.id")
                                     ->select("specialities.name as name",DB::raw("COUNT(appointments.specialitie_id) as count"))
                                     ->groupBy("specialities.name")
                                     ->get();
-        $query_patients_specialty_percentage = collect([]);
-        $total_patients_specialty = $query_patients_specialty->sum("count");
-        foreach ($query_patients_specialty as $key =>  $query_speciality) {
+        $query_patients_speciality_percentage = collect([]);
+        $total_patients_speciality = $query_patients_speciality->sum("count");
+        foreach ($query_patients_speciality as $key =>  $query_speciality) {
           $count_by_speciality = $query_speciality->count;
-          $percentage = round(($count_by_speciality/$total_patients_specialty)* 100,2);
-          $query_patients_specialty_percentage->push([
+          $percentage = round(($count_by_speciality/$total_patients_speciality)* 100,2);
+          $query_patients_speciality_percentage->push([
             "name" => $query_speciality->name,
             "percentage" => $percentage
           ]);
@@ -166,9 +185,9 @@ class DashboardKpiController extends Controller
         return response()->json([
             "months_name" => $months_name,
             "query_income_year" => $query_income_year,
-            "query_patients_specialty_percentage" =>  $query_patients_specialty_percentage,
+            "query_patients_speciality_percentage" =>  $query_patients_speciality_percentage,
             "query_patient_by_genders" => $query_patient_by_genders,
-            "query_patients_specialty" => $query_patients_specialty,
+            "query_patients_speciality" => $query_patients_speciality,
           
         ]);
 

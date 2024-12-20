@@ -13,6 +13,12 @@ export class DashboardService {
     public authService: AuthService,
   ){ }
 
+  getConfigdashboard(){
+    let headers = new HttpHeaders({'Authorization': 'bearer' +this.authService.token});
+    let URL = URL_SERVICIOS+"/dashboard/config";
+    return this.http.get(URL,{headers: headers});
+  }
+
   dashboardAdmin(data:any){
     let headers = new HttpHeaders({'Authorization': 'bearer' +this.authService.token});
     let URL = URL_SERVICIOS+"/dashboard/admin";

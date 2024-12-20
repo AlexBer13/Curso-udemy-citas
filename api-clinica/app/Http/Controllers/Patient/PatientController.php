@@ -22,6 +22,7 @@ class PatientController extends Controller
      */
     public function index(Request $request)
     {
+        $this->authorize('viewAny',Patient::class);
         $search = $request->search;
 
         $patients = Patient::where(DB::raw("CONCAT(patients.name,' ',IFNULL(patients.surname,''),' ',patients.email)"),"like","%".$search."%")
@@ -35,7 +36,8 @@ class PatientController extends Controller
     }
 
     public function profile($id) {
-
+        
+        $this->authorize('profile',Patient::class);
         $cachedRecord = Redis::get('profile_patient_#'.$id);
         $data_patient = [];
         if(isset($cachedRecord)) {
@@ -96,6 +98,7 @@ class PatientController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create',Patient::class);
         $patient_is_valid = Patient::where("n_document",$request->n_document)->first();
 
         if($patient_is_valid){
@@ -132,6 +135,7 @@ class PatientController extends Controller
      */
     public function show(string $id)
     {
+        $this->authorize('view',Patient::class);
         $patient = Patient::FindOrFail($id);
 
         return response()->json([
@@ -144,6 +148,7 @@ class PatientController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $this->authorize('update',Patient::class);
         $patient_is_valid = Patient::where("id","<>",$id)->where("n_document",$request->n_document)->first();
 
         if($patient_is_valid){
@@ -191,6 +196,7 @@ class PatientController extends Controller
      */
     public function destroy(string $id)
     {
+        $this->authorize('delete',Patient::class);
         $patient = Patient::findOrFail($id);
         if($patient->avatar){
             Storage::delete($patient->avatar);
